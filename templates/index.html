@@ -105,7 +105,7 @@
             if (data.status === "success") {
                 document.getElementById("sonuc").innerHTML =
                     `✅ ${data.isim} ${data.tutar} TL gönderdi!`;
-                listeYukle(); // Ödeme sonrası tabloyu güncelle
+                listeYukle();
             } else {
                 document.getElementById("sonuc").innerHTML = "❌ Ödeme başarısız!";
             }
@@ -121,7 +121,7 @@
                 return;
             }
 
-            tbody.innerHTML = data.map(r => {
+            tbody.innerHTML = data.slice(0, 5).map(r => {
                 const tarih = new Date(r.tarih);
                 const tarihStr = tarih.toLocaleDateString("tr-TR", {
                     day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit"
@@ -135,7 +135,6 @@
             }).join("");
         }
 
-        // Sayfa açılınca listeyi yükle
         listeYukle();
     </script>
 </body>
