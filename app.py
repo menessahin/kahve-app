@@ -2,12 +2,13 @@ from flask import Flask, request, jsonify, render_template
 import psycopg2
 import iyzipay
 import json
+import os
 
 app = Flask(__name__)
 
 options = {
-    "api_key": "sandbox-XEsYzmCEAcREh0ygeCpbRzDTIKlfgsqC",
-    "secret_key": "sandbox-8OkML6PnUJlSlyZIUoml160ajUlj88xZ",
+    "api_key": os.environ.get("IYZICO_API_KEY"),
+    "secret_key": os.environ.get("IYZICO_SECRET_KEY"),
     "base_url": "sandbox-api.iyzipay.com"
 }
 
@@ -17,15 +18,13 @@ def index():
 
 @app.route("/ode", methods=["POST"])
 def ode():
-    conn = psycopg2.connect("postgresql://neondb_owner:npg_F4yGW9RCvqhg@ep-silent-bonus-asc1bk7o-pooler.c-4.eu-central-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require")
+    conn = psycopg2.connect(os.environ.get("DATABASE_URL"))
     cursor = conn.cursor()
-
     isim = request.form["isim"]
     tutar = request.form["tutar"]
     tutar_iyzico = "{:.1f}".format(float(tutar))
     tutar_db = int(float(tutar))
     mesaj = request.form["mesaj"]
-
     req = {
         "locale": "tr",
         "conversationId": "123456789",
@@ -76,23 +75,20 @@ def ode():
             }
         ]
     }
-
     result = iyzipay.Payment().create(req, options)
     response = json.loads(result.read().decode("utf-8"))
     status = response["status"]
-
     cursor.execute(
         "INSERT INTO payments (sender_name, amount, message, status) VALUES (%s, %s, %s, %s)",
         (isim, tutar_db, mesaj, status)
     )
     conn.commit()
     conn.close()
-
     return jsonify({"status": status, "isim": isim, "tutar": tutar_db})
 
 @app.route("/liste")
 def liste():
-    conn = psycopg2.connect("postgresql://neondb_owner:npg_F4yGW9RCvqhg@ep-silent-bonus-asc1bk7o-pooler.c-4.eu-central-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require")
+    conn = psycopg2.connect(os.environ.get("DATABASE_URL"))
     cursor = conn.cursor()
     cursor.execute("SELECT sender_name, amount, message, created_at FROM payments ORDER BY created_at DESC")
     rows = cursor.fetchall()
