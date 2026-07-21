@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Kahve Ismarla ☕</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f9f3ee;
+        }
+        h1 { color: #6f4e37; }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #6f4e37;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+        button:hover { background: #5a3e2b; }
+        #sonuc { margin-top: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>☕ Kahve Ismarla</h1>
+    <input type="text" id="isim" placeholder="Adın" />
+    <input type="number" id="tutar" placeholder="Tutar (TL)" />
+    <textarea id="mesaj" placeholder="Mesajın (opsiyonel)"></textarea>
+    <button onclick="ode()">Kahve Ismarla ☕</button>
+    <div id="sonuc"></div>
+
+    <script>
+        async function ode() {
+            const isim = document.getElementById("isim").value;
+            const tutar = document.getElementById("tutar").value;
+            const mesaj = document.getElementById("mesaj").value;
+
+            const formData = new FormData();
+            formData.append("isim", isim);
+            formData.append("tutar", tutar);
+            formData.append("mesaj", mesaj);
+
+            const res = await fetch("/ode", { method: "POST", body: formData });
+            const data = await res.json();
+
+            if (data.status === "success") {
+                document.getElementById("sonuc").innerHTML = 
+                    `✅ ${data.isim} ${data.tutar} TL gönderdi!`;
+            } else {
+                document.getElementById("sonuc").innerHTML = "❌ Ödeme başarısız!";
+            }
+        }
+    </script>
+</body>
+</html>
