@@ -6,12 +6,12 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 500px;
+            max-width: 600px;
             margin: 50px auto;
             padding: 20px;
             background: #f9f3ee;
         }
-        h1 { color: #6f4e37; }
+        h1, h2 { color: #6f4e37; }
         input, textarea {
             width: 100%;
             padding: 10px;
@@ -32,6 +32,35 @@
         }
         button:hover { background: #5a3e2b; }
         #sonuc { margin-top: 20px; font-weight: bold; }
+
+        /* Tablo */
+        .tablo-bolum {
+            margin-top: 40px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        }
+        th {
+            background: #6f4e37;
+            color: white;
+            padding: 10px 12px;
+            text-align: left;
+            font-size: 14px;
+        }
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #f0e8e0;
+            font-size: 14px;
+            color: #333;
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #fdf6f0; }
+        .bos { text-align: center; color: #999; padding: 20px; }
     </style>
 </head>
 <body>
@@ -41,6 +70,23 @@
     <textarea id="mesaj" placeholder="Mesajın (opsiyonel)"></textarea>
     <button onclick="ode()">Kahve Ismarla ☕</button>
     <div id="sonuc"></div>
+
+    <div class="tablo-bolum">
+        <h2>☕ Son Kahveler</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>İsim</th>
+                    <th>Tutar</th>
+                    <th>Mesaj</th>
+                    <th>Tarih</th>
+                </tr>
+            </thead>
+            <tbody id="kahve-listesi">
+                <tr><td colspan="4" class="bos">Yükleniyor...</td></tr>
+            </tbody>
+        </table>
+    </div>
 
     <script>
         async function ode() {
@@ -57,12 +103,40 @@
             const data = await res.json();
 
             if (data.status === "success") {
-                document.getElementById("sonuc").innerHTML = 
+                document.getElementById("sonuc").innerHTML =
                     `✅ ${data.isim} ${data.tutar} TL gönderdi!`;
+                listeYukle(); // Ödeme sonrası tabloyu güncelle
             } else {
                 document.getElementById("sonuc").innerHTML = "❌ Ödeme başarısız!";
             }
         }
+
+        async function listeYukle() {
+            const res = await fetch("/liste");
+            const data = await res.json();
+            const tbody = document.getElementById("kahve-listesi");
+
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="bos">Henüz kahve ısmarlanmadı.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = data.map(r => {
+                const tarih = new Date(r.tarih);
+                const tarihStr = tarih.toLocaleDateString("tr-TR", {
+                    day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit"
+                });
+                return `<tr>
+                    <td>${r.isim}</td>
+                    <td>${r.tutar} TL</td>
+                    <td>${r.mesaj || "-"}</td>
+                    <td>${tarihStr}</td>
+                </tr>`;
+            }).join("");
+        }
+
+        // Sayfa açılınca listeyi yükle
+        listeYukle();
     </script>
 </body>
 </html>
