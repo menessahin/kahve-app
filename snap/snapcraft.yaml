@@ -1,0 +1,17 @@
+name: kahve-app
+base: core22
+version: '1.0'
+summary: Kahve Ismarla Uygulaması
+description: |
+  Flask tabanlı kahve sipariş ve ödeme uygulaması.
+grade: stable
+confinement: strict
+
+apps:
+  kahve-app:
+    command: bin/app-launcher
+
+parts:
+  app:
+    plugin: python
+    source: .
