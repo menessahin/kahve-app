@@ -1,141 +1,170 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <title>Kahve Ismarla ☕</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-            background: #f9f3ee;
-        }
-        h1, h2 { color: #6f4e37; }
-        input, textarea {
-            width: 100%;
-            padding: 10px;
-            margin: 8px 0;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            box-sizing: border-box;
-        }
-        button {
-            background: #6f4e37;
-            color: white;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            width: 100%;
-            font-size: 16px;
-        }
-        button:hover { background: #5a3e2b; }
-        #sonuc { margin-top: 20px; font-weight: bold; }
-
-        /* Tablo */
-        .tablo-bolum {
-            margin-top: 40px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-        }
-        th {
-            background: #6f4e37;
-            color: white;
-            padding: 10px 12px;
-            text-align: left;
-            font-size: 14px;
-        }
-        td {
-            padding: 10px 12px;
-            border-bottom: 1px solid #f0e8e0;
-            font-size: 14px;
-            color: #333;
-        }
-        tr:last-child td { border-bottom: none; }
-        tr:hover td { background: #fdf6f0; }
-        .bos { text-align: center; color: #999; padding: 20px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bana Bir Kahve Ismarla</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: #f5efe6;
+      color: #3b2a20;
+      line-height: 1.5;
+    }
+    main { max-width: 520px; margin: 0 auto; padding: 32px 16px 64px; }
+    h1 { font-size: 1.8rem; margin: 0 0 4px; }
+    h2 { font-size: 1.2rem; margin: 32px 0 12px; }
+    .alt { margin: 0 0 24px; color: #7a6555; font-size: 0.9rem; }
+    form, .kart {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(59, 42, 32, 0.08);
+    }
+    label { display: block; font-weight: 600; margin: 12px 0 4px; }
+    label:first-child { margin-top: 0; }
+    input, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #d8c9b8;
+      border-radius: 8px;
+      font: inherit;
+      background: #fffdf9;
+    }
+    textarea { resize: vertical; min-height: 80px; }
+    button {
+      margin-top: 16px;
+      width: 100%;
+      padding: 12px;
+      border: 0;
+      border-radius: 8px;
+      background: #6f4e37;
+      color: #fff;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:hover { background: #5a3f2c; }
+    button:disabled { opacity: 0.6; cursor: wait; }
+    .bilgi { font-size: 0.8rem; color: #7a6555; margin-top: 10px; }
+    #sonuc { margin-top: 14px; padding: 10px 12px; border-radius: 8px; display: none; }
+    #sonuc.ok { display: block; background: #e6f4ea; color: #1e6b34; }
+    #sonuc.err { display: block; background: #fdeaea; color: #a12626; }
+    ul { list-style: none; margin: 0; padding: 0; }
+    li { padding: 12px 0; border-bottom: 1px solid #eadfd1; }
+    li:last-child { border-bottom: 0; }
+    li p { margin: 4px 0 0; color: #5d4a3c; word-break: break-word; }
+    .bos { color: #7a6555; }
+  </style>
 </head>
 <body>
-    <h1>☕ Kahve Ismarla</h1>
-    <input type="text" id="isim" placeholder="Adın" />
-    <input type="number" id="tutar" placeholder="Tutar (TL)" />
-    <textarea id="mesaj" placeholder="Mesajın (opsiyonel)"></textarea>
-    <button onclick="ode()">Kahve Ismarla ☕</button>
-    <div id="sonuc"></div>
+  <main>
+    <h1>☕ Bana bir kahve ısmarla</h1>
+    <p class="alt">Test ortamı: bu sayfada gerçek para çekilmez.</p>
 
-    <div class="tablo-bolum">
-        <h2>☕ Son Kahveler</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>İsim</th>
-                    <th>Tutar</th>
-                    <th>Mesaj</th>
-                    <th>Tarih</th>
-                </tr>
-            </thead>
-            <tbody id="kahve-listesi">
-                <tr><td colspan="4" class="bos">Yükleniyor...</td></tr>
-            </tbody>
-        </table>
+    <form id="form">
+      <label for="isim">İsminiz</label>
+      <input id="isim" name="isim" type="text" maxlength="50" required>
+
+      <label for="tutar">Tutar (TL)</label>
+      <input id="tutar" name="tutar" type="number" min="1" max="5000" step="1" value="50" required>
+
+      <label for="mesaj">Mesajınız (isteğe bağlı)</label>
+      <textarea id="mesaj" name="mesaj" maxlength="200"></textarea>
+
+      <button id="btn" type="submit">Kahve ısmarla</button>
+      <p class="bilgi">İsminiz, tutar ve mesajınız aşağıdaki herkese açık listede görünür.</p>
+      <div id="sonuc"></div>
+    </form>
+
+    <h2>Kahve ısmarlayanlar</h2>
+    <div class="kart">
+      <ul id="liste"></ul>
     </div>
+  </main>
 
-    <script>
-        async function ode() {
-            const isim = document.getElementById("isim").value;
-            const tutar = document.getElementById("tutar").value;
-            const mesaj = document.getElementById("mesaj").value;
+  <script>
+    const form = document.getElementById("form");
+    const btn = document.getElementById("btn");
+    const sonuc = document.getElementById("sonuc");
+    const liste = document.getElementById("liste");
 
-            const formData = new FormData();
-            formData.append("isim", isim);
-            formData.append("tutar", tutar);
-            formData.append("mesaj", mesaj);
+    function goster(mesaj, basarili) {
+      sonuc.textContent = mesaj;
+      sonuc.className = basarili ? "ok" : "err";
+    }
 
-            const res = await fetch("/ode", { method: "POST", body: formData });
-            const data = await res.json();
+    function bosMesaj(metin) {
+      const li = document.createElement("li");
+      li.className = "bos";
+      li.textContent = metin;
+      liste.replaceChildren(li);
+    }
 
-            if (data.status === "success") {
-                document.getElementById("sonuc").innerHTML =
-                    `✅ ${data.isim} ${data.tutar} TL gönderdi!`;
-                listeYukle();
-            } else {
-                document.getElementById("sonuc").innerHTML = "❌ Ödeme başarısız!";
-            }
+    async function listeyiYukle() {
+      try {
+        const res = await fetch("/liste");
+        const veri = await res.json();
+
+        if (!Array.isArray(veri) || veri.length === 0) {
+          bosMesaj("Henüz kimse kahve ısmarlamadı.");
+          return;
         }
 
-        async function listeYukle() {
-            const res = await fetch("/liste");
-            const data = await res.json();
-            const tbody = document.getElementById("kahve-listesi");
+        liste.replaceChildren();
+        veri.forEach((k) => {
+          const li = document.createElement("li");
 
-            if (data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" class="bos">Henüz kahve ısmarlanmadı.</td></tr>';
-                return;
-            }
+          const isim = document.createElement("strong");
+          isim.textContent = k.isim;          // textContent: XSS'e karşı güvenli
+          li.append(isim, " — " + k.tutar + " TL");
 
-            tbody.innerHTML = data.slice(0, 5).map(r => {
-                const tarih = new Date(r.tarih);
-                const tarihStr = tarih.toLocaleDateString("tr-TR", {
-                    day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit"
-                });
-                return `<tr>
-                    <td>${r.isim}</td>
-                    <td>${r.tutar} TL</td>
-                    <td>${r.mesaj || "-"}</td>
-                    <td>${tarihStr}</td>
-                </tr>`;
-            }).join("");
+          if (k.mesaj) {
+            const p = document.createElement("p");
+            p.textContent = k.mesaj;          // textContent: XSS'e karşı güvenli
+            li.append(p);
+          }
+          liste.append(li);
+        });
+      } catch (e) {
+        bosMesaj("Liste şu an yüklenemiyor.");
+      }
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      btn.disabled = true;
+      goster("Ödeme yapılıyor...", true);
+
+      try {
+        const res = await fetch("/ode", {
+          method: "POST",
+          body: new URLSearchParams(new FormData(form)),
+        });
+
+        let veri = {};
+        try { veri = await res.json(); } catch (_) {}
+
+        if (res.status === 429) {
+          goster("Çok fazla deneme yaptınız, lütfen biraz bekleyin.", false);
+        } else if (veri.status === "success") {
+          goster("Teşekkürler " + veri.isim + "! " + veri.tutar + " TL'lik kahve ısmarladınız ☕", true);
+          form.reset();
+          document.getElementById("tutar").value = 50;
+          listeyiYukle();
+        } else {
+          goster(veri.hata || "Ödeme başarısız oldu.", false);
         }
+      } catch (err) {
+        goster("Bağlantı hatası, lütfen tekrar deneyin.", false);
+      } finally {
+        btn.disabled = false;
+      }
+    });
 
-        listeYukle();
-    </script>
+    listeyiYukle();
+  </script>
 </body>
 </html>
